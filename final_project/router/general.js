@@ -22,46 +22,90 @@ public_users.post("/register", (req,res) => {
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
   //Write your code here
-  res.send(JSON.stringify(books, null, '\t'));
+  new Promise((resolve, reject) => {
+    resolve(JSON.stringify(books, null, '\t'));
+  })
+  .then((data) => {
+    res.send(data);
+  })
+  .catch((err) => {
+    res.status(500).send("Error occurred while fetching the books.");
+  });
 });
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
-  const isbn = req.params.isbn;
-  let book = undefined;
-  for (let key in books) {
-    if (key == isbn) {
-      book = books[key];
+  new Promise((resolve, reject) => {
+    const isbn = req.params.isbn;
+    let book = undefined;
+    for (let key in books) {
+      if (key == isbn) {
+        book = books[key];
+        break;
+      }
     }
-  }
-  res.send(book);
+    if (book) {
+      resolve(book);
+    } else {
+      reject("Book not found");
+    }
+  })
+  .then((book) => {
+    res.send(book);
+  })
+  .catch((error) => {
+    res.status(404).send({ message: error });
+  });
  });
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
   //Write your code here
-  const author = req.params.author;
-  let book = undefined;
-  for (let key in books) {
-    if (books[key].author == author) {
-      book = books[key];
+  new Promise((resolve, reject) => {
+    const author = req.params.author;
+    let foundBooks = [];
+    for (let key in books) {
+      if (books[key].author == author) {
+        foundBooks.push(books[key]);
+      }
     }
-  }
-  res.send(book);
+    if (foundBooks.length > 0) {
+      resolve(foundBooks);
+    } else {
+      reject("No books found by this author");
+    }
+  })
+  .then((books) => {
+    res.send(books);
+  })
+  .catch((error) => {
+    res.status(404).send({ message: error });
+  });
 });
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
   //Write your code here
-  const title = req.params.title;
-  let book = undefined;
-  for (let key in books) {
-    if (books[key].title == title) {
-      book = books[key];
+  new Promise((resolve, reject) => {
+    const title = req.params.title;
+    let foundBooks = [];
+    for (let key in books) {
+      if (books[key].title == title) {
+        foundBooks.push(books[key]);
+      }
     }
-  }
-  res.send(book);
+    if (foundBooks.length > 0) {
+      resolve(foundBooks);
+    } else {
+      reject("No books found with this title");
+    }
+  })
+  .then((books) => {
+    res.send(books);
+  })
+  .catch((error) => {
+    res.status(404).send({ message: error });
+  });
 });
 
 //  Get book review
